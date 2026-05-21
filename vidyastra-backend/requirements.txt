@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+langchain
+langchain-community
+langchain-openai
+qdrant-client
+openai
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+PyPDF2
+pydantic[email]

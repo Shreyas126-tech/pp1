@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  --color-primary-50: #fff0f5;
+  --color-primary-100: #ffe1eb;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #db2777;
+  --color-primary-900: #831843;
+  
+  --color-accent-500: #f59e0b;
+  
+  --color-background-dark: #0f172a;
+  --color-background-darker: #020617;
+  --color-surface-dark: rgba(30, 41, 59, 0.7);
+  
+  /* Indian inspired colors: Saffron, White, Green hints, Deep purples/blues for modern feel */
+  --color-saffron-500: #ff9933;
+  --color-india-green-500: #138808;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    /* Adding a subtle gradient background for the premium feel */
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, rgba(15,23,42,0.05) 100%);
+  }
+  .dark body {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+  }
+}
+
+/* Glassmorphism Utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-lg border border-white/10 shadow-2xl;
+  }
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)];
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-saffron-500 via-primary-500 to-indigo-500;
+  }
+}
