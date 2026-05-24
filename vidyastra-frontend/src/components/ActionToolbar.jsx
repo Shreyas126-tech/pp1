@@ -75,6 +75,10 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
     const bestVoice = findBestVoice(langCodeToUse);
     if (bestVoice) {
       utterance.voice = bestVoice;
+    } else if (!langCodeToUse.startsWith('en')) {
+      alert(`Your browser does not have a Text-to-Speech voice installed for ${langCodeToUse}. Please install the language pack in your OS settings or use Google Chrome.`);
+      setIsSpeaking(null);
+      return;
     }
 
     utterance.onend = () => setIsSpeaking(null);

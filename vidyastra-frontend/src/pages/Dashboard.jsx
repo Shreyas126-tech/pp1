@@ -236,16 +236,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="glass-card p-6 flex flex-col gap-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-saffron-500" /> Recommendations
-          </h2>
-          <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-            <h3 className="font-semibold mb-1">Upcoming Review</h3>
-            <p className="text-sm text-gray-400 mb-3">Operating Systems flashcards are ready.</p>
-            <button className="text-sm text-primary-400 hover:text-primary-300">Start Review &rarr;</button>
-          </div>
-        </div>
       </div>
 
       {/* --- MODALS --- */}

@@ -377,6 +377,7 @@ def generate_quiz(topic: str, num_questions: int = 8, level: str = "Intermediate
 
     # Force English for reliable JSON generation
     prompt = f"""You are a strict JSON quiz generator. Generate exactly {num_questions} high-quality, highly accurate multiple choice questions covering the A-to-Z of "{topic}".
+Make the questions real-world, highly informative, and inspired by technical interviews (like LeetCode, NeetCode, or GitHub technical questions) if applicable.
 {("Use ONLY this specific document material to create fact-based questions: " + context[:2500]) if context else ""}
 Do NOT use outside knowledge. 
 
@@ -510,19 +511,16 @@ Topic: {text[:1500]}"""
 
 
 def generate_mind_map(topic: str) -> str:
-    prompt = f"""Create a Mermaid mindmap diagram for "{topic}".
-Start the diagram with the keyword 'mindmap' followed by a newline, then 'root(("{topic}"))', and then indent children with spaces.
+    prompt = f"""Create a Mermaid flowchart diagram for "{topic}" using a top-down tree structure.
+Start the diagram with 'graph TD', then define nodes.
 Do NOT output anything except the raw mermaid code. No markdown code blocks, no explanations.
 
 Example format:
-mindmap
-  root(("Machine Learning"))
-    Supervised
-      Classification
-      Regression
-    Unsupervised
-      Clustering
-      Dimensionality Reduction
+graph TD
+  A["Machine Learning"] --> B["Supervised"]
+  A --> C["Unsupervised"]
+  B --> D["Regression"]
+  B --> E["Classification"]
 """
     reply = _call_llm(prompt, max_tokens=600)
     if not reply:
