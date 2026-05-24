@@ -17,3 +17,6 @@ passlib[bcrypt]
 python-multipart
 PyPDF2
 pydantic[email]
+openai
+fastembed
+deep-translator
