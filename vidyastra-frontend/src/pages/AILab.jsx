@@ -1,51 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Brain, MapPin, CalendarDays, Loader, X, Lightbulb, PenTool, Users, SearchCode, AlertCircle, Music, BookOpen, Laugh, Briefcase, GraduationCap } from 'lucide-react';
-import { explainLike, generateMindMap, generateStudyPlan, draftProfessional, simulateInterview, reviewLogic } from '../services/api';
+import { Sparkles, CalendarDays, Loader, X, Lightbulb, PenTool, Users, SearchCode, AlertCircle, Music, BookOpen, Laugh, Briefcase, GraduationCap } from 'lucide-react';
+import { explainLike, generateStudyPlan, draftProfessional, simulateInterview, reviewLogic } from '../services/api';
 import ActionToolbar from '../components/ActionToolbar';
-import mermaid from 'mermaid';
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  fontFamily: 'Inter, sans-serif'
-});
-
-const Mermaid = ({ chart }) => {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (ref.current && chart) {
-      const renderChart = async () => {
-        try {
-          const id = `mermaid-svg-${Math.round(Math.random() * 100000)}`;
-          const { svg } = await mermaid.render(id, chart);
-          if (ref.current) {
-            ref.current.innerHTML = svg;
-          }
-        } catch (e) {
-          console.error("Mermaid parsing error", e);
-          if (ref.current) {
-            ref.current.innerHTML = `<p class="text-red-400">Error rendering diagram. The AI output might not be perfectly formatted.</p><pre class="text-xs text-gray-500 mt-2">${chart}</pre>`;
-          }
-        }
-      };
-      renderChart();
-    }
-  }, [chart]);
-
-  return <div ref={ref} className="flex justify-center w-full overflow-x-auto p-4" />;
-};
-
-const MindMapView = ({ data }) => {
-  if (!data) return <p className="text-gray-400">Invalid mind map data.</p>;
-  return (
-    <div className="w-full bg-gray-900/50 rounded-xl border border-white/10">
-      <Mermaid chart={data} />
-    </div>
-  );
-};
 
 const EXPLAIN_MODES = [
   { id: '5-year-old', label: 'Like I\'m 5', icon: <Lightbulb className="w-5 h-5" />, color: 'from-yellow-500 to-orange-500' },
@@ -58,7 +15,6 @@ const EXPLAIN_MODES = [
 
 const TABS = [
   { id: 'explain', label: 'Explain Concept', icon: <Lightbulb className="w-4 h-4" /> },
-  { id: 'mindmap', label: 'Mind Map', icon: <MapPin className="w-4 h-4" /> },
   { id: 'studyplan', label: 'Study Planner', icon: <CalendarDays className="w-4 h-4" /> },
   { id: 'draft', label: 'Professional Drafter', icon: <PenTool className="w-4 h-4" /> },
   { id: 'interview', label: 'Interview Sim', icon: <Users className="w-4 h-4" /> },
@@ -89,9 +45,6 @@ const AILab = () => {
       if (activeTab === 'explain') {
         const res = await explainLike(input, selectedMode);
         text = res.data.explanation;
-      } else if (activeTab === 'mindmap') {
-        const res = await generateMindMap(input);
-        text = res.data.mermaid; // mermaid string for diagram
       } else if (activeTab === 'studyplan') {
         const res = await generateStudyPlan(input, days);
         text = res.data.plan;
@@ -117,7 +70,6 @@ const AILab = () => {
   const getPlaceholder = () => {
     switch (activeTab) {
       case 'explain': return 'Paste any complex text, concept, or paragraph here...';
-      case 'mindmap': return 'e.g., Machine Learning, Photosynthesis...';
       case 'studyplan': return 'e.g., Data Structures and Algorithms...';
       case 'draft': return 'Enter context (e.g., Applying for Senior Dev role)...';
       case 'interview': return 'Enter job role (e.g., React Developer)...';
@@ -128,7 +80,6 @@ const AILab = () => {
 
   const getResultIcon = () => {
     switch (resultType) {
-      case 'mindmap': return <MapPin className="w-5 h-5 text-saffron-500" />;
       case 'studyplan': return <CalendarDays className="w-5 h-5 text-saffron-500" />;
       case 'draft': return <PenTool className="w-5 h-5 text-saffron-500" />;
       case 'interview': return <Users className="w-5 h-5 text-saffron-500" />;
@@ -139,7 +90,6 @@ const AILab = () => {
 
   const getResultTitle = () => {
     switch (resultType) {
-      case 'mindmap': return 'Mind Map';
       case 'studyplan': return 'Study Plan';
       case 'draft': return 'Professional Draft';
       case 'interview': return 'Mock Interview Simulator';
@@ -287,11 +237,6 @@ const AILab = () => {
               </button>
             </div>
 
-            {resultType === 'mindmap' ? (
-              <MindMapView data={originalResult} />
-            ) : (
-              <>
-                {/* Dual Column for text results */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                   <div className="bg-white/5 p-5 rounded-xl border border-white/10 flex flex-col">
                     <h3 className="text-sm font-bold text-saffron-500 mb-3 uppercase tracking-wider">Original English</h3>
@@ -307,15 +252,11 @@ const AILab = () => {
                   </div>
                 </div>
 
-                {activeTab !== 'mindmap' && (
-                  <ActionToolbar
-                    originalText={typeof originalResult === 'string' ? originalResult : ''}
-                    translatedText={translatedResult}
-                    onTranslated={handleTranslated}
-                  />
-                )}
-              </>
-            )}
+                <ActionToolbar
+                  originalText={typeof originalResult === 'string' ? originalResult : ''}
+                  translatedText={translatedResult}
+                  onTranslated={handleTranslated}
+                />
           </motion.div>
         )}
       </AnimatePresence>

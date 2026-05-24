@@ -49,12 +49,20 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
   const handleSpeak = useCallback((textToSpeak, langCodeToUse, id) => {
     if (isSpeaking === id) {
       window.speechSynthesis.cancel();
+      if (window.currentGoogleAudio) {
+        window.currentGoogleAudio.pause();
+        window.currentGoogleAudio = null;
+      }
       setIsSpeaking(null);
       return;
     }
     
     // Stop any ongoing speech
     window.speechSynthesis.cancel();
+    if (window.currentGoogleAudio) {
+      window.currentGoogleAudio.pause();
+      window.currentGoogleAudio = null;
+    }
     
     if (!textToSpeak) return;
 
@@ -68,6 +76,41 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
       .replace(/~~/g, '')
       .trim();
 
+    // If it's a non-English translation, use Google Translate TTS API for guaranteed playback
+    if (!langCodeToUse.startsWith('en')) {
+      const langPrefix = langCodeToUse.split('-')[0];
+      const chunks = clean.match(/.{1,150}(?:\s|$)/g) || [clean];
+      let currentChunk = 0;
+      
+      const playNext = () => {
+        if (currentChunk >= chunks.length) {
+          setIsSpeaking(null);
+          return;
+        }
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunks[currentChunk])}&tl=${langPrefix}&client=tw-ob`;
+        const audio = new window.Audio(url);
+        
+        audio.onended = () => {
+          currentChunk++;
+          playNext();
+        };
+        audio.onerror = () => {
+          setIsSpeaking(null);
+        };
+        
+        window.currentGoogleAudio = audio;
+        audio.play().catch(e => {
+          console.error("Google TTS Error:", e);
+          setIsSpeaking(null);
+        });
+      };
+      
+      playNext();
+      setIsSpeaking(id);
+      return;
+    }
+
+    // For English, use native browser TTS
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.lang = langCodeToUse;
     utterance.rate = 0.95;
@@ -75,10 +118,6 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
     const bestVoice = findBestVoice(langCodeToUse);
     if (bestVoice) {
       utterance.voice = bestVoice;
-    } else if (!langCodeToUse.startsWith('en')) {
-      alert(`Your browser does not have a Text-to-Speech voice installed for ${langCodeToUse}. Please install the language pack in your OS settings or use Google Chrome.`);
-      setIsSpeaking(null);
-      return;
     }
 
     utterance.onend = () => setIsSpeaking(null);
@@ -87,13 +126,11 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
       setIsSpeaking(null);
     };
 
-    // Fix for Chrome/Windows silent failure bug
     window.speechSynthesis.speak(utterance);
     if (window.speechSynthesis.paused) {
       window.speechSynthesis.resume();
     }
     
-    // Additional watchdog to keep it alive for longer texts
     const interval = setInterval(() => {
       if (!window.speechSynthesis.speaking) {
         clearInterval(interval);
@@ -104,7 +141,6 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
     }, 14000);
 
     utterance.addEventListener('end', () => clearInterval(interval));
-    
     setIsSpeaking(id);
   }, [findBestVoice, isSpeaking]);
 

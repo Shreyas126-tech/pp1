@@ -5,9 +5,8 @@ import useAuthStore from '../store/authStore';
 
 const SECTIONS = [
   { id: 'account', label: 'Account', icon: <UserIcon className="w-5 h-5 text-saffron-500" /> },
-  { id: 'ai', label: 'AI Models', icon: <Cpu className="w-5 h-5 text-primary-500" /> },
-  { id: 'voice', label: 'Voice & Audio', icon: <Volume2 className="w-5 h-5 text-green-500" /> },
-  { id: 'about', label: 'About Us', icon: <CheckCircle className="w-5 h-5 text-indigo-500" /> },
+  { id: 'ollama', label: 'Local AI Connect', icon: <Cpu className="w-5 h-5 text-emerald-500" /> },
+  { id: 'voice', label: 'Voice Options', icon: <Volume2 className="w-5 h-5 text-rose-500" /> }
 ];
 
 const Settings = () => {
@@ -182,43 +181,6 @@ const Settings = () => {
               </motion.section>
             )}
 
-            {/* About Us Section */}
-            {activeSection === 'about' && (
-              <motion.section
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
-              >
-                <h2 className="text-xl font-semibold border-b border-white/10 pb-2">About VidyAstra</h2>
-                <div className="space-y-4 text-gray-300 text-sm leading-relaxed">
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <h3 className="font-bold text-saffron-500 mb-2 text-base">Step-by-Step Guide</h3>
-                    <ul className="list-decimal list-inside space-y-2">
-                      <li>Upload your academic documents via the <strong className="text-white">Dashboard</strong>.</li>
-                      <li>Use the <strong className="text-white">AI Tutor</strong> to ask questions strictly based on your syllabus.</li>
-                      <li>Generate <strong className="text-white">Quizzes and Flashcards</strong> in Review Tools to prepare for exams.</li>
-                      <li>Experiment with deeper technical concepts and Mermaid diagrams in the <strong className="text-white">AI Lab</strong>.</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <h3 className="font-bold text-primary-400 mb-2 text-base">Real World Applications</h3>
-                    <p>VidyAstra solves the core problem of student distraction and hallucinated AI answers. By strictly confining the AI to uploaded documents and operating 100% locally, it guarantees data privacy and factual accuracy. It is designed for students, researchers, and professionals who need hyper-accurate analysis without the risk of AI hallucination.</p>
-                  </div>
-
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <h3 className="font-bold text-indigo-400 mb-2 text-base">Technology Stack</h3>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li><strong>Frontend:</strong> React, TailwindCSS, Framer Motion</li>
-                      <li><strong>Backend:</strong> FastAPI, Python</li>
-                      <li><strong>AI Engine:</strong> Ollama (Local LLM - qwen2.5)</li>
-                      <li><strong>Database:</strong> ChromaDB (Local Vector DB)</li>
-                      <li><strong>Translation:</strong> Google Translate API</li>
-                      <li><strong>Diagramming:</strong> Mermaid.js</li>
-                    </ul>
-                  </div>
-                </div>
-              </motion.section>
             )}
 
             {/* Actions */}
