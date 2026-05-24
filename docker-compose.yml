@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Database
+  postgres:
+    image: postgres:15
+    container_name: vidyastra-db
+    environment:
+      POSTGRES_USER: vidyastra_user
+      POSTGRES_PASSWORD: vidyastra_password
+      POSTGRES_DB: vidyastra_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Backend
+  backend:
+    build:
+      context: ./vidyastra-backend
+      dockerfile: Dockerfile
+    container_name: vidyastra-backend
+    environment:
+      - DATABASE_URL=postgresql://vidyastra_user:vidyastra_password@postgres:5432/vidyastra_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SECRET_KEY=supersecretkey_please_change_in_production_vidyastra
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    volumes:
+      - ./vidyastra-backend/uploads:/app/uploads
+      - ./vidyastra-backend/chroma_db:/app/chroma_db
+
+  # Frontend
+  frontend:
+    build:
+      context: ./vidyastra-frontend
+      dockerfile: Dockerfile
+    container_name: vidyastra-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

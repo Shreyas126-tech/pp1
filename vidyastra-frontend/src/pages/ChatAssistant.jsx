@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Mic, MicOff, Settings2, BookOpen, Volume2, VolumeX, Loader } from 'lucide-react';
+import { Send, Mic, MicOff, Settings2, BookOpen, Volume2, VolumeX, Loader, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { askQuestion } from '../services/api';
 
 const ChatAssistant = () => {
   const [messages, setMessages] = useState([
-    { role: 'ai', content: 'Namaste! I am VidyAstra AI. Upload a document or ask me a question about your syllabus.', level: 'intermediate', confidence: 1.0 }
+    { role: 'ai', content: 'Namaste! I am VidyAstra AI. Upload a document or ask me a question about your syllabus.', originalContent: null, level: 'intermediate', confidence: 1.0 }
   ]);
   const [input, setInput] = useState('');
   const [level, setLevel] = useState('Intermediate');
-  const [language, setLanguage] = useState('English');
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -35,36 +34,23 @@ const ChatAssistant = () => {
       recognitionRef.current.interimResults = true;
 
       recognitionRef.current.onresult = (event) => {
-        let interimTranscript = '';
         let finalTranscript = '';
-
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
-          } else {
-            interimTranscript += event.results[i][0].transcript;
           }
         }
-        
         if (finalTranscript) {
           setInput((prev) => prev + finalTranscript);
         }
       };
 
-      recognitionRef.current.onerror = (event) => {
-        console.error("Speech recognition error", event.error);
-        setIsListening(false);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
+      recognitionRef.current.onerror = () => setIsListening(false);
+      recognitionRef.current.onend = () => setIsListening(false);
     }
     
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
+      if (recognitionRef.current) recognitionRef.current.stop();
     };
   }, []);
 
@@ -73,48 +59,46 @@ const ChatAssistant = () => {
       recognitionRef.current?.stop();
       setIsListening(false);
     } else {
-      // Set language for recognition based on selected language
-      const langMap = {
-        'English': 'en-IN',
-        'Hindi': 'hi-IN',
-        'Kannada': 'kn-IN',
-        'Tamil': 'ta-IN',
-        'Telugu': 'te-IN',
-        'Malayalam': 'ml-IN'
-      };
       if (recognitionRef.current) {
-        recognitionRef.current.lang = langMap[language] || 'en-IN';
+        recognitionRef.current.lang = 'en-US';
         recognitionRef.current.start();
         setIsListening(true);
       }
     }
   };
 
-  const speakText = (text) => {
-    if (isSpeaking) {
+  const speakText = (text, id) => {
+    if (isSpeaking === id) {
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+      setIsSpeaking(null);
       return;
     }
     
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const cleanText = text
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/#{1,6}\s*/g, '')
+      .replace(/`/g, '')
+      .replace(/\[Confidence:.*?\]/g, '')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const langCode = 'en-US';
+    utterance.lang = langCode;
     
-    // Attempt to set voice based on language
-    const langMap = {
-      'English': 'en-IN',
-      'Hindi': 'hi-IN',
-      'Kannada': 'kn-IN',
-      'Tamil': 'ta-IN',
-      'Telugu': 'te-IN',
-      'Malayalam': 'ml-IN'
-    };
-    utterance.lang = langMap[language] || 'en-IN';
+    const voices = window.speechSynthesis.getVoices();
+    const langPrefix = langCode.split('-')[0];
+    const matchingVoice = voices.find(v => v.lang === langCode) || voices.find(v => v.lang.startsWith(langPrefix));
+    if (matchingVoice) utterance.voice = matchingVoice;
     
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    
-    setIsSpeaking(true);
+    utterance.rate = 0.95;
+    utterance.onend = () => setIsSpeaking(null);
+    utterance.onerror = () => setIsSpeaking(null);
     window.speechSynthesis.speak(utterance);
+    setIsSpeaking(id);
   };
 
   const handleSend = async (e) => {
@@ -137,7 +121,7 @@ const ChatAssistant = () => {
         message: userText,
         session_id: sessionId,
         level: level,
-        language: language,
+        language: 'English',
       });
 
       if (!sessionId) {
@@ -149,19 +133,18 @@ const ChatAssistant = () => {
         {
           role: 'ai',
           content: res.data.reply,
+          originalContent: null,
           confidence: res.data.confidence_score,
           citations: res.data.citations,
         }
       ]);
       
-      // Auto-speak if configured
-      // speakText(res.data.reply);
-      
     } catch (err) {
       console.error(err);
+      const detail = err.response?.data?.detail || err.message || 'Unknown error';
       setMessages([
         ...newMessages,
-        { role: 'ai', content: 'Sorry, I encountered an error while processing your request.' }
+        { role: 'ai', content: `Error: ${detail}\n\nPlease make sure Ollama is running and try again.` }
       ]);
     } finally {
       setLoading(false);
@@ -169,9 +152,20 @@ const ChatAssistant = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Top Bar for Settings */}
-      <div className="glass px-4 py-3 rounded-2xl mb-4 flex flex-wrap justify-between items-center gap-4 border border-white/10">
+    <div className="flex flex-col h-full bg-black">
+      {/* Header */}
+      <header className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center bg-gray-900/50 backdrop-blur-md sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-saffron-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
+            <Bot className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-saffron-400">
+              VidyAstra AI Tutor
+            </h1>
+            <p className="text-xs text-gray-400">Your personal document assistant</p>
+          </div>
+        </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-saffron-500" />
@@ -185,27 +179,11 @@ const ChatAssistant = () => {
               <option className="bg-background-dark text-white">Expert</option>
             </select>
           </div>
-          
-          <div className="h-6 w-px bg-white/20"></div>
-
-          <select 
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="bg-transparent border-none text-sm font-medium focus:outline-none"
-          >
-            <option className="bg-background-dark text-white">English</option>
-            <option className="bg-background-dark text-white">Hindi</option>
-            <option className="bg-background-dark text-white">Kannada</option>
-            <option className="bg-background-dark text-white">Tamil</option>
-            <option className="bg-background-dark text-white">Telugu</option>
-            <option className="bg-background-dark text-white">Malayalam</option>
-          </select>
+          <button className="p-2 hover:bg-white/10 rounded-full transition">
+            <Settings2 className="w-5 h-5" />
+          </button>
         </div>
-        
-        <button className="p-2 hover:bg-white/10 rounded-full transition">
-          <Settings2 className="w-5 h-5" />
-        </button>
-      </div>
+      </header>
 
       {/* Chat Area */}
       <div className="flex-1 glass-card p-4 overflow-y-auto mb-4 flex flex-col gap-4">
@@ -230,17 +208,17 @@ const ChatAssistant = () => {
                 )}
                 
                 {msg.citations && msg.citations.length > 0 && msg.citations.map((cite, i) => (
-                  <span key={i} className="bg-white/5 px-2 py-1 rounded border border-white/10 hover:bg-white/10 cursor-pointer transition">
-                    📄 {cite.source} (Pg {cite.page})
+                  <span key={i} className="bg-white/5 px-2 py-1 rounded border border-white/10">
+                    {cite.source} (Pg {cite.page})
                   </span>
                 ))}
                 
                 <button 
-                  onClick={() => speakText(msg.content)}
+                  onClick={() => speakText(msg.content, idx)}
                   className="hover:text-white transition flex items-center gap-1 bg-white/5 px-2 py-1 rounded border border-white/10"
                 >
-                  {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
-                  {isSpeaking ? 'Stop' : 'Listen'}
+                  {isSpeaking === idx ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                  {isSpeaking === idx ? 'Stop' : 'Listen'}
                 </button>
               </div>
             )}
@@ -250,7 +228,7 @@ const ChatAssistant = () => {
         {loading && (
           <div className="self-start items-start flex gap-2 text-gray-400 p-4">
              <Loader className="w-5 h-5 animate-spin text-saffron-500" />
-             <span className="text-sm">VidyAstra is thinking...</span>
+             <span className="text-sm">VidyAstra is generating a response... (may take 10-20s)</span>
           </div>
         )}
         <div ref={messagesEndRef} />

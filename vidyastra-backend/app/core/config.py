@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./vidyastra.db"
     
-    # AI Keys
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    # AI Integration
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3")
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
     QDRANT_URL: str = os.getenv("QDRANT_URL", "http://localhost:6333")
     QDRANT_API_KEY: str = os.getenv("QDRANT_API_KEY", "")
 

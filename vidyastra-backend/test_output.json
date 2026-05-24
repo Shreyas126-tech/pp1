@@ -1,0 +1,79 @@
+{
+  "translation_hindi": "मशीन लर्निंग कृत्रिम बुद्धिमत्ता का एक शक्तिशाली उपसमूह है जो कंप्यूटर को डेटा से सीखने में सक्षम बनाता है।",
+  "quiz_hindi": [
+    {
+      "question": "मशीन लर्निंग का मुख्य लक्ष्य क्या है?",
+      "options": [
+        "एआई का एक उपसमुच्चय",
+        "एक प्रोग्रामिंग भाषा",
+        "एक डेटाबेस",
+        "एक ऑपरेटिंग सिस्टम"
+      ],
+      "correct_answer": 1,
+      "explanation": "मशीन लर्निंग का मुख्य लक्ष्य मशीनों को डेटा से सीखने और स्पष्ट रूप से प्रोग्राम किए बिना भविष्यवाणियां या निर्णय लेने में सक्षम बनाना है।"
+    },
+    {
+      "question": "मशीन लर्निंग में एक प्रमुख घटक क्या है?",
+      "options": [
+        "एक प्रोग्रामिंग भाषा",
+        "एक डेटाबेस",
+        "एक ऑपरेटिंग सिस्टम",
+        "एआई का एक उपसमुच्चय"
+      ],
+      "correct_answer": 2,
+      "explanation": "मशीन लर्निंग में मुख्य घटक एल्गोरिदम या मॉडल है जो सीखने का कार्य करता है।"
+    }
+  ],
+  "flashcards_tamil": [
+    {
+      "front": "AI என்றால் என்ன?",
+      "back": "செயற்கை நுண்ணறிவு (AI) என்பது கணினி அறிவியலின் ஒரு துறையாகும், இது பொதுவாக மனித நுண்ணறிவு தேவைப்படும் பணிகளைச் செய்யக்கூடிய அறிவார்ந்த இயந்திரங்கள் மற்றும் அமைப்புகளை உருவாக்குவதில் கவனம் செலுத்துகிறது."
+    },
+    {
+      "front": "AI அமைப்பின் முக்கிய கூறுகள் யாவை?",
+      "back": "ஒரு AI அமைப்பு பொதுவாக மூன்று முக்கிய கூறுகளைக் கொண்டுள்ளது: சென்சார்கள், அல்காரிதம்கள் மற்றும் தரவு. சென்சார்கள் சுற்றுச்சூழலைப் பற்றிய தகவல்களைச் சேகரிக்கின்றன, அல்காரிதம்கள் இந்தத் தகவலைச் செயலாக்க முடிவுகளை எடுக்கின்றன, மேலும் தரவு இந்த செயல்முறைகளின் முடிவுகளைச் சேமிக்கிறது."
+    }
+  ],
+  "podcast": [
+    {
+      "speaker": "Host",
+      "text": "Good evening, everyone! Welcome to our podcast about Artificial Intelligence (AI). Today we are diving into the fascinating world of AI and exploring its applications and implications."
+    },
+    {
+      "speaker": "Expert",
+      "text": "Thank you for having me. The core concept is that artificial intelligence refers to the ability of machines or software systems to perform tasks that would typically require human intelligence, such as learning, reasoning, problem-solving, perception, and creative thinking."
+    },
+    {
+      "speaker": "Host",
+      "text": "That's exactly what we're going to be exploring in today's episode. Let's start by discussing some of the key features of AI that make it so fascinating."
+    },
+    {
+      "speaker": "Expert",
+      "text": "Sure, let's talk about one of the most exciting aspects of artificial intelligence: machine learning. Machine learning is a subset of AI that involves training algorithms to learn from data and improve their performance over time without being explicitly programmed or taught."
+    },
+    {
+      "speaker": "Host",
+      "text": "Machine learning has been making waves in recent years, with applications ranging from self-driving cars to personalized medicine. Can you tell us more about how machine learning works?"
+    },
+    {
+      "speaker": "Expert",
+      "text": "Absolutely! Machine learning algorithms use statistical models and patterns in data to make predictions or decisions. These models are trained on large datasets that contain examples of the desired outcomes, which helps them learn from new data."
+    },
+    {
+      "speaker": "Host",
+      "text": "Another fascinating aspect of AI is natural language processing (NLP). How does NLP work?"
+    },
+    {
+      "speaker": "Expert",
+      "text": "Natural language processing involves the use of algorithms to understand and interpret human language. It can be used for tasks such as speech recognition, text generation, sentiment analysis, and more."
+    },
+    {
+      "speaker": "Host",
+      "text": "And finally, how is AI being integrated into our daily lives? What are some examples of AI in action?"
+    },
+    {
+      "speaker": "Expert",
+      "text": "AI is already making its way into our daily lives through applications such as voice assistants like Siri and Alexa, self-driving cars, chatbots for customer service, and more."
+    }
+  ]
+}

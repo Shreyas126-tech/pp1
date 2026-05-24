@@ -1,11 +1,20 @@
 import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Brain, LayoutDashboard, MessageSquare, LogOut, Settings } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Brain, LayoutDashboard, MessageSquare, LogOut, Settings, Sparkles, BookOpen } from 'lucide-react';
 import useAuthStore from '../store/authStore';
+
+const navItems = [
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/chat', label: 'AI Tutor', icon: MessageSquare },
+  { to: '/review', label: 'Review Tools', icon: BookOpen },
+  { to: '/ai-lab', label: 'AI Lab', icon: Sparkles, badge: 'NEW' },
+  { to: '/settings', label: 'Settings', icon: Settings },
+];
 
 const MainLayout = () => {
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -21,23 +30,30 @@ const MainLayout = () => {
           <span className="text-xl font-bold text-gradient">VidyAstra</span>
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 text-white hover:bg-white/10 transition">
-            <LayoutDashboard size={20} />
-            Dashboard
-          </Link>
-          <Link to="/chat" className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition">
-            <MessageSquare size={20} />
-            AI Tutor
-          </Link>
-          <Link to="/review" className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition">
-            <Brain size={20} />
-            Review Tools
-          </Link>
-          <Link to="/settings" className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition">
-            <Settings size={20} />
-            Settings
-          </Link>
+        <nav className="flex-1 px-4 space-y-1 mt-4">
+          {navItems.map(item => {
+            const isActive = location.pathname === item.to;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-saffron-500/20 to-primary-600/10 text-white border border-saffron-500/30'
+                    : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Icon size={20} className={isActive ? 'text-saffron-500' : ''} />
+                {item.label}
+                {item.badge && (
+                  <span className="ml-auto text-[10px] bg-gradient-to-r from-saffron-500 to-primary-600 text-white px-1.5 py-0.5 rounded-full font-bold">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
         
         <div className="p-4 border-t border-white/10">

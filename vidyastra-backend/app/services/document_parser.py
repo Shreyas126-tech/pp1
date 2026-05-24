@@ -1,49 +1,60 @@
 """
 Document parsing service for VidyAstra AI.
-Handles PDF text extraction and text chunking for RAG.
+Handles PDF text extraction, OCR, and text chunking for RAG.
 """
 import os
 import re
-
+from PIL import Image
+import io
 
 def extract_text_from_file(filepath: str) -> str:
-    """Extract text content from uploaded files. Supports .txt and .pdf."""
+    """Extract text content from uploaded files. Supports .txt, .pdf, images with OCR fallback."""
     ext = os.path.splitext(filepath)[1].lower()
+    text = ""
 
     if ext == ".txt":
         with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
+            text = f.read()
+    elif ext in [".png", ".jpg", ".jpeg", ".bmp"]:
+        try:
+            import pytesseract
+            img = Image.open(filepath)
+            text = pytesseract.image_to_string(img)
+        except Exception as e:
+            print(f"OCR failed for image: {e}")
+            text = f"Error: Could not extract text from image. Make sure Tesseract is installed. ({e})"
     elif ext == ".pdf":
         try:
-            # Try PyPDF2 first
             from PyPDF2 import PdfReader
             reader = PdfReader(filepath)
-            text = ""
             for page in reader.pages:
                 page_text = page.extract_text()
                 if page_text:
                     text += page_text + "\n"
-            return text
-        except ImportError:
-            # Fallback: read raw bytes and decode
-            with open(filepath, "rb") as f:
-                raw = f.read()
-            # Very basic extraction from PDF bytes
-            text_parts = re.findall(rb'\(([^)]+)\)', raw)
-            return " ".join(p.decode("utf-8", errors="ignore") for p in text_parts)
+                    
+            # If PyPDF2 found little/no text (e.g., scanned PDF), try OCR fallback
+            if len(text.strip()) < 50:
+                try:
+                    from pdf2image import convert_from_path
+                    import pytesseract
+                    images = convert_from_path(filepath)
+                    for img in images:
+                        text += pytesseract.image_to_string(img) + "\n"
+                except Exception as e:
+                    print(f"PDF OCR fallback failed: {e}")
+        except Exception as e:
+            print(f"PDF Parsing failed: {e}")
     else:
-        # For other text-based files, attempt plain read
+        # Fallback for other text formats
         with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
-
+            text = f.read()
+            
+    return text
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 100) -> list:
-    """
-    Split text into overlapping chunks for vector embedding.
-    """
+    """Split text into overlapping chunks for vector embedding."""
     if not text.strip():
         return []
-
     words = text.split()
     chunks = []
     start = 0
@@ -52,5 +63,4 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 100) -> list:
         chunk = " ".join(words[start:end])
         chunks.append(chunk)
         start += chunk_size - overlap
-
     return chunks

@@ -5,6 +5,8 @@ import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import ChatAssistant from './pages/ChatAssistant';
 import ReviewTools from './pages/ReviewTools';
+import Settings from './pages/Settings';
+import AILab from './pages/AILab';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import useAuthStore from './store/authStore';
@@ -26,6 +28,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<ChatAssistant />} />
           <Route path="/review" element={<ReviewTools />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/ai-lab" element={<AILab />} />
         </Route>
       </Routes>
     </Router>

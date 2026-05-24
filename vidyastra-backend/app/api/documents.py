@@ -8,7 +8,7 @@ from app.models.user import User
 from app.models.document import Document
 from app.schemas.document import DocumentResponse
 from app.services.document_parser import extract_text_from_file, chunk_text
-from app.services.ai_pipeline import add_document_to_store
+from app.services.ai_pipeline import add_document_to_store, generate_summary
 
 router = APIRouter()
 
@@ -95,13 +95,7 @@ def simplify_document(
     
     try:
         text = extract_text_from_file(doc.filepath)
-        # Mock summary for MVP without API keys
-        summary = "Based on the document, here are the key simplified points:\n"
-        points = [p.strip() for p in text.split('.') if len(p.strip()) > 20][:3]
-        for p in points:
-            summary += f"- {p}\n"
-        if not points:
-            summary += "- The document contains formatting or structures that need deeper AI processing."
+        summary = generate_summary(text)
         
         return {"summary": summary}
     except Exception as e:

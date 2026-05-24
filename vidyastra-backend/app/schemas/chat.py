@@ -29,10 +29,16 @@ class QuizRequest(BaseModel):
     topic: str
     num_questions: int = 5
     level: str = "Intermediate"
+    language: str = "English"
 
 class FlashcardItem(BaseModel):
     front: str
     back: str
+
+class FlashcardRequest(BaseModel):
+    topic: str = "General"
+    count: int = 10
+    language: str = "English"
 
 class SummaryRequest(BaseModel):
     document_id: int
