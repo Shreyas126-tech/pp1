@@ -14,6 +14,7 @@ from app.core.config import settings
 from deep_translator import GoogleTranslator
 
 # ── Configuration ──────────────────────────────────────────────────────────
+GROQ_API_KEY = getattr(settings, "GROQ_API_KEY", "")
 OLLAMA_MODEL = settings.OLLAMA_MODEL
 OLLAMA_BASE_URL = settings.OLLAMA_BASE_URL
 CHROMA_DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "chroma_db")
@@ -26,13 +27,22 @@ def _get_openai_client():
     if _openai_client is None:
         try:
             from openai import OpenAI
-            _openai_client = OpenAI(
-                api_key="ollama",
-                base_url=OLLAMA_BASE_URL,
-                timeout=180.0
-            )
+            if GROQ_API_KEY:
+                _openai_client = OpenAI(
+                    api_key=GROQ_API_KEY,
+                    base_url="https://api.groq.com/openai/v1",
+                    timeout=60.0
+                )
+                print("[VidyAstra] Connected to Groq Cloud API!")
+            else:
+                _openai_client = OpenAI(
+                    api_key="ollama",
+                    base_url=OLLAMA_BASE_URL,
+                    timeout=180.0
+                )
+                print("[VidyAstra] Connected to Local Ollama.")
         except Exception as e:
-            print(f"[VidyAstra] Failed to init Ollama client: {e}")
+            print(f"[VidyAstra] Failed to init LLM client: {e}")
             return None
     return _openai_client
 
@@ -69,13 +79,15 @@ def _call_llm(prompt: str, retries: int = 2, json_mode: bool = False, max_tokens
 
         def _do_call():
             try:
+                model_name = "llama3-8b-8192" if GROQ_API_KEY else OLLAMA_MODEL
                 kwargs = {
-                    "model": OLLAMA_MODEL,
+                    "model": model_name,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.3,
                     "max_tokens": max_tokens,
                 }
-                if json_mode:
+                if json_mode and not GROQ_API_KEY:
+                    # Groq doesn't strictly need json_object format flag if prompt is good
                     kwargs["response_format"] = {"type": "json_object"}
                 response = client.chat.completions.create(**kwargs)
                 result[0] = response.choices[0].message.content

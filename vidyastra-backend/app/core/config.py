@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./vidyastra.db"
     
     # AI Integration
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3")
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
     QDRANT_URL: str = os.getenv("QDRANT_URL", "http://localhost:6333")
