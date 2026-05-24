@@ -181,8 +181,6 @@ const Settings = () => {
               </motion.section>
             )}
 
-            )}
-
             {/* Actions */}
             <div className="pt-4 flex items-center justify-between">
               {saved && (
