@@ -380,9 +380,9 @@ def generate_quiz(topic: str, num_questions: int = 8, level: str = "Intermediate
 {("Use ONLY this specific document material to create fact-based questions: " + context[:2500]) if context else ""}
 Do NOT use outside knowledge. 
 
-Each question MUST have exactly 4 distinct, meaningful answer options.
+Each question MUST have exactly 4 options: exactly 1 correct option and exactly 3 different incorrect options.
 The correct_answer field must be the integer index (0-3) of the correct option.
-You MUST provide a valid, detailed explanation justifying why the answer is correct.
+The explanation field MUST ONLY justify the correct option and explain why it is correct. Do NOT explain or justify the wrong options.
 
 IMPORTANT: Output ONLY valid JSON in English. Use this EXACT format:
 {{"items": [

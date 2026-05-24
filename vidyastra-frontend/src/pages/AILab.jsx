@@ -307,7 +307,7 @@ const AILab = () => {
                   </div>
                 </div>
 
-                {activeTool !== 'mind-map' && (
+                {activeTab !== 'mindmap' && (
                   <ActionToolbar
                     originalText={typeof originalResult === 'string' ? originalResult : ''}
                     translatedText={translatedResult}
