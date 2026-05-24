@@ -525,8 +525,17 @@ graph TD
     reply = _call_llm(prompt, max_tokens=600)
     if not reply:
         raise Exception("Failed to generate mind map.")
-    # Strip any markdown code blocks that the LLM might have added
-    reply = reply.replace("```mermaid", "").replace("```", "").strip()
+    
+    # Clean the reply to ensure it's raw mermaid code
+    reply = reply.strip()
+    if reply.startswith("```mermaid"):
+        reply = reply[len("```mermaid"):].strip()
+    elif reply.startswith("```"):
+        reply = reply[len("```"):].strip()
+        
+    if reply.endswith("```"):
+        reply = reply[:-3].strip()
+        
     return reply
 
 

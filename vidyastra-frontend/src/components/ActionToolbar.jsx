@@ -82,8 +82,29 @@ const ActionToolbar = ({ originalText, translatedText, onTranslated }) => {
     }
 
     utterance.onend = () => setIsSpeaking(null);
-    utterance.onerror = () => setIsSpeaking(null);
+    utterance.onerror = (e) => {
+      console.error("SpeechSynthesis Error:", e);
+      setIsSpeaking(null);
+    };
+
+    // Fix for Chrome/Windows silent failure bug
     window.speechSynthesis.speak(utterance);
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+    
+    // Additional watchdog to keep it alive for longer texts
+    const interval = setInterval(() => {
+      if (!window.speechSynthesis.speaking) {
+        clearInterval(interval);
+      } else {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 14000);
+
+    utterance.addEventListener('end', () => clearInterval(interval));
+    
     setIsSpeaking(id);
   }, [findBestVoice, isSpeaking]);
 
